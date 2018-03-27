@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "es6",
+    "importHelpers": true,
+    "outDir": "./lib/",
+    "sourceMap": true,
+    "declaration": true
+  },
+  "files": ["./src/index.ts"]
+}
