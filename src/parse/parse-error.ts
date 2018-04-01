@@ -1,11 +1,11 @@
-export interface ParseErrorPosition {
+export interface ParsePosition {
   line: number;
   col: number;
   pos: number;
 }
 export default class ParseError extends Error {
-  errorStart: ParseErrorPosition;
-  errorEnd: ParseErrorPosition;
+  errorStart!: ParsePosition;
+  errorEnd!: ParsePosition;
   constructor(message: string = '') {
     super(message);
   }

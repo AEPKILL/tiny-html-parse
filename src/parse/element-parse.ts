@@ -22,34 +22,36 @@ export default class ElementParse extends Parse {
     }
 
     const error = new ParseError();
+
     while (!stream.done) {
       error.errorStart = this.stream.getPositionDetail();
-      if (this.isEndStartTag()) {
+      if (this.isEndTag()) {
         const tagName = this.readTagEndName();
         const lastTagStartName: string = this.tagNameStack.pop();
         if (tagName !== lastTagStartName) {
           error.errorEnd = stream.getPositionDetail();
           error.message = `[${stream.line}:${
             stream.col
-          }]: Tagname (${tagName}) Mismatch`;
+          }]: Tagname (${tagName}) mismatch`;
         }
+        return node;
       }
-      if (TextParse.canParse(this.stream)) {
+      if (this.tagNameStack.length === 0) {
+        break;
+      } else if (TextParse.canParse(this.stream)) {
         node.appendChild(new TextParse(this.stream).parse());
       } else if (CommentParse.canParse(this.stream)) {
         node.appendChild(new CommentParse(this.stream).parse());
       } else if (ElementParse.canParse(this.stream)) {
         node.appendChild(this.parse());
-      } else {
-        if (this.tagNameStack.length === 0) {
-          break;
-        }
-        error.errorEnd = stream.getPositionDetail();
-        error.message = error.message = `[${stream.line}:${
-          stream.col
-        }]: Tag Mismatch`;
-        throw error;
       }
+    }
+    if (this.tagNameStack.length) {
+      error.errorEnd = stream.getPositionDetail();
+      error.message = error.message = `[${error.errorStart.line}:${
+        error.errorStart.col
+      }]: Tag (${node.tagName}) mismatch `;
+      throw error;
     }
     return node;
   }
@@ -172,7 +174,7 @@ export default class ElementParse extends Parse {
     const { content, pos } = this.stream;
     return content[pos] === '/' && content[pos + 1] === '>';
   }
-  private isEndStartTag() {
+  private isEndTag() {
     const { content, pos } = this.stream;
     return content[pos] === '<' && content[pos + 1] === '/';
   }

@@ -1,3 +1,4 @@
+import { ParsePosition } from './parse/parse-error';
 export enum NODE_TYPE {
   ELEMENT = 1 /* Node.ELEMENT_NODE */,
   TEXT = 3 /* Node.TEXT_NODE */,
@@ -10,10 +11,7 @@ export interface TinyHtmlNodeJson {
   parent?: TinyHtmlNodeJson;
 }
 export interface TinyHtmlNodeMetadata {
-  start?: {
-    line: number;
-    col: number;
-  };
+  position?: ParsePosition;
 }
 export abstract class TinyHtmlNode {
   protected readonly _nodeType: NODE_TYPE;
