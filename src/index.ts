@@ -8,3 +8,4 @@ export {
 } from './tiny-html-element-node';
 export { TinyHtmlTextNode, isTinyHtmlTextNode } from './tiny-html-text-node';
 export { TinyHtmlNode } from './tiny-html-node';
+export { parseString } from './parse/index';

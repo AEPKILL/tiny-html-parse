@@ -55,7 +55,7 @@ export class StringStream {
   }
   skipWhitespace() {
     while (!this.done) {
-      if (!isWhitespace(this.current)) {
+      if (!isWhitespace(this.current!)) {
         break;
       }
       this.next();
@@ -73,9 +73,9 @@ export class StringStream {
       if (escaped) {
         escaped = false;
         str += ch;
-      } else if (endTest(ch, this)) {
+      } else if (endTest(ch!, this)) {
         break;
-      } else if (isEscaped(ch)) {
+      } else if (isEscaped(ch!)) {
         escaped = true;
       } else {
         str += ch;

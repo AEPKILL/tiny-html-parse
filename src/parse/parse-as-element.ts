@@ -36,9 +36,9 @@ export default function parseAsElement(stream: StringStream) {
       const tagName = readElementTagEndName(stream);
       if (tagName !== node.tagName) {
         error.errorEnd = stream.getPositionDetail();
-        error.message = `[${stream.line}:${
-          stream.col
-        }]: Tagname (${tagName}) mismatch`;
+        error.message = `[${node.meta.position.line}:${
+          node.meta.position.col
+        }]: Tagname (${node.tagName}) mismatch`;
         throw error;
       }
       break;
@@ -95,8 +95,8 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       (ch, s) =>
         isWhitespace(ch) ||
         ch === '=' ||
-        isElementTagClose(s) ||
-        isElementTagSelfClose(s)
+        isElementTagClose(s!) ||
+        isElementTagSelfClose(s!)
     );
 
     parseAttrItemError.errorStart = stream.getPositionDetail();
@@ -105,7 +105,7 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       continue;
     }
 
-    if (isWhitespace(stream.current)) {
+    if (isWhitespace(stream.current!)) {
       stream.skipWhitespace();
     }
 
@@ -139,7 +139,7 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       parseAttrItemError.errorEnd = stream.getPositionDetail();
       parseAttrItemError.message = `[${parseAttrItemError.errorStart.line}:${
         parseAttrItemError.errorStart.col
-      }]: Attribute (${attrName}) expected  a end quote`;
+      }]: Attribute (${attrName}) expected a end quote`;
       throw parseAttrItemError;
     }
 

@@ -8,7 +8,8 @@
     "outDir": "./lib/",
     "sourceMap": true,
     "declaration": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "moduleResolution": "node"
   },
   "files": ["./src/index.ts"]
 }
