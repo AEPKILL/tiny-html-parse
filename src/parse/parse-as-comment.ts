@@ -25,7 +25,7 @@ export default function parseAsComment(stream: StringStream) {
   stream.skip(4);
   error.errorStart = stream.getPositionDetail();
   while (true) {
-    if (stream.current === '-' && isCommentEndTag(stream)) {
+    if (isCommentEndTag(stream)) {
       stream.skip(3);
       break;
     }
