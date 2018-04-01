@@ -61,8 +61,11 @@ export class StringStream {
       this.next();
     }
   }
-  readEscaped(end: ((ch: string) => boolean) | string) {
-    const endTest = typeof end === 'string' ? (ch: string) => ch === end : end;
+  readEscaped(end: ((ch: string, stream?: StringStream) => boolean) | string) {
+    const endTest =
+      typeof end === 'string'
+        ? (ch: string, stream?: StringStream) => ch === end
+        : end;
     let str = '';
     let escaped = false;
     while (!this.done) {
@@ -70,7 +73,7 @@ export class StringStream {
       if (escaped) {
         escaped = false;
         str += ch;
-      } else if (endTest(ch)) {
+      } else if (endTest(ch, this)) {
         break;
       } else if (isEscaped(ch)) {
         escaped = true;

@@ -14,7 +14,10 @@ export function isElementTagBeginStart(stream: StringStream) {
 }
 
 export default function parseAsElement(stream: StringStream) {
+  const position = stream.getPositionDetail();
   const node = new TinyHtmlElementNode(readElementTagBeginName(stream));
+
+  node.meta.position = position;
 
   readAttributes(stream, node);
 
@@ -89,11 +92,11 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
 
     const parseAttrItemError = new ParseError();
     const attrName = stream.readEscaped(
-      ch =>
+      (ch, s) =>
         isWhitespace(ch) ||
         ch === '=' ||
-        isElementTagClose(stream) ||
-        isElementTagSelfClose(stream)
+        isElementTagClose(s) ||
+        isElementTagSelfClose(s)
     );
 
     parseAttrItemError.errorStart = stream.getPositionDetail();
