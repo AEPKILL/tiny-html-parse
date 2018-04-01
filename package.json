@@ -16,7 +16,9 @@
     "typescript": "^2.8.1"
   },
   "dependencies": {
+    "@types/htmlparser2": "^3.7.31",
     "@types/node": "^9.6.1",
+    "htmlparser2": "^3.9.2",
     "ts-node": "^5.0.1",
     "tslib": "^1.9.0"
   }
