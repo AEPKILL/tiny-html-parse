@@ -12,7 +12,7 @@ export interface TinyHtmlNodeJson {
 export interface TinyHtmlNodeMetadata {
   start?: {
     line: number;
-    position: number;
+    col: number;
   };
 }
 export abstract class TinyHtmlNode {

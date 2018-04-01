@@ -2,6 +2,7 @@
 /lib/
 coverage/
 .ref/
+.vscode/
 
 package-lock.json
 *.log
