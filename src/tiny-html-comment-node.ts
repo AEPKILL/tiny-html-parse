@@ -1,20 +1,35 @@
-import TinyHtmlNode, { NODE_TYPE } from './tiny-html-node';
+import TinyHtmlNode, { NODE_TYPE, TinyHtmlNodeJson } from './tiny-html-node';
+
+export interface TinyHtmlCommentNodeJson extends TinyHtmlNodeJson {
+  content: string;
+}
 
 export class TinyHtmlCommentNode extends TinyHtmlNode {
   content: string;
 
-  constructor(content: string) {
+  constructor(content = '') {
     super(NODE_TYPE.COMMENT);
     this.content = content;
   }
-
-  static isTinyCommentElementNode = isTinyCommentElementNode;
+  cloneNode() {
+    return new TinyHtmlCommentNode(this.content);
+  }
+  toJson(): TinyHtmlCommentNodeJson {
+    return {
+      nodeType: NODE_TYPE.COMMENT,
+      content: this.content
+    };
+  }
+  toString() {
+    return `<!-- ${this.content} -->`;
+  }
+  static isTinyCommentNode = isTinyCommentNode;
 }
 
-export function isTinyCommentElementNode(
+export function isTinyCommentNode(
   node: TinyHtmlNode
 ): node is TinyHtmlCommentNode {
-  return node.nodeType === NODE_TYPE.COMMENT;
+  return node && node.nodeType === NODE_TYPE.COMMENT;
 }
 
 export default TinyHtmlCommentNode;
