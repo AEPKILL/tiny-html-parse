@@ -30,6 +30,13 @@ export class StringStream {
     this._col = 0;
     this._pos = 0;
   }
+  clone() {
+    const stream = new StringStream(this.content);
+    stream._col = this._col;
+    stream._pos = this._pos;
+    stream._line = this._line;
+    return stream;
+  }
   next(): string | undefined {
     const ch = this._content[++this._pos];
     if (isBreakLine(ch)) {

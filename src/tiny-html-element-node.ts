@@ -10,6 +10,7 @@ export class TinyHtmlElementNode extends TinyHtmlNode {
   private readonly _tagName: string;
   private readonly _children: TinyHtmlNode[];
   private _attributes: Dictionary<string>;
+  private _text?: string;
   get tagName() {
     return this._tagName;
   }
@@ -18,6 +19,12 @@ export class TinyHtmlElementNode extends TinyHtmlNode {
   }
   get attributes() {
     return this._attributes;
+  }
+  get text() {
+    return this._text || '';
+  }
+  set text(value: string) {
+    this._text = value;
   }
   constructor(tagName: string) {
     super(NODE_TYPE.ELEMENT);

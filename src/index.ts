@@ -8,7 +8,7 @@ export {
 } from './tiny-html-element-node';
 export { TinyHtmlTextNode, isTinyHtmlTextNode } from './tiny-html-text-node';
 export { TinyHtmlNode } from './tiny-html-node';
-export { parseString, parseStream } from './parse/index';
+export { parseString, parseStream, ParseOptions } from './parse/index';
 export {
   isCommentTagStart,
   default as parseAsComment
