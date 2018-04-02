@@ -12,18 +12,20 @@ export default function parseAsTextContentElement(
   let text = '';
   while (!stream.done) {
     if (isElementTagEndStart(stream)) {
-      const tempStream = stream.clone();
       try {
+        const tempStream = stream.clone();
         const tagName = readElementTagEndName(tempStream);
         if (tagName === node.tagName) {
           stream.skip(tempStream.pos - stream.pos);
           break;
         }
       } catch {
-        // nothing to do
+        text += '</';
+        stream.skip(2);
       }
+    } else {
+      text += stream.current;
     }
-    text += stream.current;
     stream.next();
   }
   node.text = text;

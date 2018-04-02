@@ -31,5 +31,7 @@ balabala
 <div>hello world</span>
 // 错误，标签不匹配
 <div> hello world <div>
+// 错误，标签不匹配, div <> Div 大小写需要严格匹配
+<div>lalala</Div>
 ```
 
