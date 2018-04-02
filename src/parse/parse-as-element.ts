@@ -73,9 +73,7 @@ export function readElementTagBeginName(stream: StringStream) {
 
   if (tagName.length <= 0) {
     error.errorEnd = stream.getPositionDetail();
-    error.message = `[${stream.line}:${
-      stream.col
-    }]: Tag begin name can't be empty`;
+    error.message = `Tag begin name can't be empty`;
     throw error;
   }
 
@@ -92,9 +90,7 @@ export function readAttributes(
       const error = new ParseError();
       error.errorStart = node.meta.position!;
       error.errorEnd = stream.getPositionDetail();
-      error.message = `[${stream.line}:${stream.col}]: Tag (${
-        node.tagName
-      }) unexpected end`;
+      error.message = `Tag <${node.tagName} ... unexpected end`;
       throw error;
     }
 
@@ -104,6 +100,8 @@ export function readAttributes(
     if (isElementTagSelfClose(stream) || isElementTagClose(stream)) {
       break;
     }
+
+    parseAttrError.errorStart = stream.getPositionDetail();
 
     const attrName = stream.readEscaped(
       (ch, s) =>
@@ -115,16 +113,14 @@ export function readAttributes(
     );
 
     if (attrName.length === 0) {
-      parseAttrError.errorStart = stream.getPositionDetail();
+      parseAttrError.messagePositon = parseAttrError.errorStart = stream.getPositionDetail();
       parseAttrError.errorEnd = stream
         .clone()
         .skip()
         .getPositionDetail();
-      parseAttrError.message = `[${parseAttrError.errorStart.line}:${
-        parseAttrError.errorStart.col
-      }]: Tag <${node.tagName} ...> has unexpect attribute name token (${
-        stream.current
-      })`;
+      parseAttrError.message = `Tag <${
+        node.tagName
+      } ...> attribute name has unexpect token '${stream.current}'`;
       throw parseAttrError;
     }
     // 跳过空白
@@ -142,17 +138,18 @@ export function readAttributes(
     // 跳过空白
     stream.skipWhitespace();
 
-    // 开始解析 Attritube Vaule
-    parseAttrError.errorStart = stream.getPositionDetail();
-
-    const quote = stream.current;
+    const quotes = stream.current;
 
     // 属性值必须以引号开头 " 或者 '
-    if (!isQuote(quote)) {
-      parseAttrError.errorEnd = stream.getPositionDetail();
-      parseAttrError.message = `[${parseAttrError.errorStart.line}:${
-        parseAttrError.errorStart.col
-      }]: Attribute (${attrName}) expected a start quote`;
+    if (!isQuote(quotes)) {
+      parseAttrError.messagePositon = parseAttrError.errorStart;
+      parseAttrError.errorEnd = stream
+        .clone()
+        .skip()
+        .getPositionDetail();
+      parseAttrError.message = `Tag ${
+        node.tagName
+      } attribute (${attrName}) expect a start quotes`;
       throw parseAttrError;
     }
 
@@ -160,14 +157,14 @@ export function readAttributes(
     stream.skip();
 
     // 解析值
-    node.attributes[attrName] = stream.readEscaped(quote);
+    node.attributes[attrName] = stream.readEscaped(quotes);
 
     // 属性值必须以同等的引号结尾
     if (!isQuote(stream.current)) {
       parseAttrError.errorEnd = stream.getPositionDetail();
-      parseAttrError.message = `[${parseAttrError.errorEnd.line}:${
-        parseAttrError.errorEnd.col
-      }]: Attribute (${attrName}) expected a end quote`;
+      parseAttrError.message = `Tag ${
+        node.tagName
+      } attribute (${attrName}) expects a end quotes`;
       throw parseAttrError;
     }
 
@@ -186,9 +183,7 @@ export function readElementTagEndName(stream: StringStream) {
 
   if (tagName.length <= 0) {
     error.errorEnd = stream.getPositionDetail();
-    error.message = `[${stream.line}:${
-      stream.col
-    }]: Tag end name can't be empty`;
+    error.message = `End tag name can't be empty`;
     throw error;
   }
 
@@ -196,9 +191,7 @@ export function readElementTagEndName(stream: StringStream) {
 
   if (stream.current !== '>') {
     error.errorEnd = stream.getPositionDetail();
-    error.message = `[${stream.line}:${
-      stream.col
-    }]: Tag end (</${tagName} ...) expected '>'`;
+    error.message = `End tag (</${tagName} ...) expect '>'`;
     throw error;
   }
 

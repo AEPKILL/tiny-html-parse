@@ -8,8 +8,22 @@ export interface ParsePosition {
 export default class ParseError {
   errorStart!: ParsePosition;
   errorEnd!: ParsePosition;
-  message: string;
-  constructor(message: string = '') {
-    this.message = message;
+  messagePositon?: ParsePosition;
+  private _message?: string;
+  get message() {
+    let pos = this.messagePositon;
+    if (!pos) {
+      pos = this.errorEnd;
+    }
+    return `[${pos && pos.line + 1}:${pos && pos.col + 1}]: ${this._message ||
+      'Unkown error'}`;
+  }
+  set message(msg: string) {
+    this._message = msg;
+  }
+  constructor(message?: string) {
+    if (message) {
+      this._message = message;
+    }
   }
 }

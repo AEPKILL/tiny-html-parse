@@ -67,16 +67,15 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
       }
       if (stack.isEmpty()) {
         error.errorEnd = stream.getPositionDetail();
-        error.message = `[${error.errorEnd.line}:${
-          error.errorEnd.col
-        }]: Unexpect close tag ${tagName}.`;
+        error.message = `Unexpected close tag ${tagName}`;
         throw error;
       }
       if (tagName !== node.tagName) {
         error.errorEnd = stream.getPositionDetail();
-        error.message = `[${error.errorStart.line}:${
-          error.errorStart.col
-        }]: Tag name mismatch (<${node.tagName} ...>*</${tagName}>)`;
+        error.messagePositon = error.errorStart;
+        error.message = `Tag name mismatch (<${
+          node.tagName
+        }${node.getAttributeString()}>...</${tagName}>)`;
         throw error;
       }
       const top = stack.pop()!;
@@ -89,20 +88,19 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
         .clone()
         .skip()
         .getPositionDetail();
-      error.message = `[${error.errorStart.line}:${
-        error.errorStart.col
-      }]: Unexpect token (${stream.current})`;
+      error.messagePositon = error.errorStart;
+      error.message = `Unexpected token (${stream.current})`;
       throw error;
     }
   }
 
   if (!stack.isEmpty()) {
     const node = stack.top!;
-    error.errorStart = node.meta.position!;
+    error.messagePositon = error.errorStart = node.meta.position!;
     error.errorEnd = stream.getPositionDetail();
-    error.message = `[${error.errorStart.line}:${
-      error.errorStart.col
-    }]: Tag (<${node.tagName}${node.getAttributeString()}>) not close`;
+    error.message = `Tag <${
+      node.tagName
+    }${node.getAttributeString()}> not close`;
     throw error;
   }
 
