@@ -15,8 +15,11 @@ export default class ParseError {
     if (!pos) {
       pos = this.errorEnd;
     }
-    return `[${pos && pos.line + 1}:${pos && pos.col + 1}]: ${this._message ||
-      'Unkown error'}`;
+    const line = pos && pos.line;
+    const col = pos && pos.col;
+    return `[${typeof line === 'number' ? line + 1 : '??'}:${
+      typeof col === 'number' ? col + 1 : '??'
+    }]: ${this._message || 'Unkown error'}`;
   }
   set message(msg: string) {
     this._message = msg;

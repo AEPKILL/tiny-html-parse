@@ -4,6 +4,6 @@ describe('ParseError', () => {
   const message = 'fire in the hole';
   test('ParseError::Constructor', () => {
     const error = new ParseError(message);
-    expect(error.message).toBe(message);
+    expect(error.message).toBe(`[??:??]: ${message}`);
   });
 });

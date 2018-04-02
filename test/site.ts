@@ -24,4 +24,7 @@ describe('site test', () => {
       async: ''
     });
   });
+  test('tc39', () => {
+    // todo
+  });
 });

@@ -3,13 +3,16 @@ import {
   isElementTagEndStart,
   readElementTagEndName
 } from './parse-as-element';
+import ParseError from './parse-error';
 import { StringStream } from './string-stream';
 
 export default function parseAsTextContentElement(
   stream: StringStream,
   node: TinyHtmlElementNode
 ) {
+  const error = new ParseError();
   let text = '';
+  error.errorStart = stream.getPositionDetail();
   while (!stream.done) {
     if (isElementTagEndStart(stream)) {
       // 尝试读取 tagEndName
@@ -18,7 +21,8 @@ export default function parseAsTextContentElement(
         const tagName = readElementTagEndName(tempStream);
         if (tagName === node.tagName) {
           stream.skip(tempStream.pos - stream.pos);
-          break;
+          node.text = text;
+          return node;
         }
       } catch {
         text += '</';
@@ -29,6 +33,7 @@ export default function parseAsTextContentElement(
     }
     stream.next();
   }
-  node.text = text;
-  return node;
+  error.errorEnd = stream.getPositionDetail();
+  error.message = `Tag <${node.tagName}> unexpected end`;
+  throw error;
 }

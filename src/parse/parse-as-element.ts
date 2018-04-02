@@ -34,6 +34,9 @@ export default function parseAsElement(stream: StringStream) {
     };
   }
 
+  // 跳过闭合符号 '>'
+  stream.skip();
+
   // 特殊处理 script 和 style 标签，这两个标签的内容放入 text 字段中
   // 这两个标签没有子标签，属于闭合标签
   switch (node.tagName.toLowerCase()) {
@@ -52,9 +55,6 @@ export default function parseAsElement(stream: StringStream) {
       };
     }
   }
-
-  // 跳过闭合符号 '>'
-  stream.skip();
 
   // 等待闭合的标签
   return {
@@ -108,6 +108,7 @@ export function readAttributes(
         isWhitespace(ch) ||
         ch === '=' ||
         ch === '<' ||
+        ch === '>' ||
         isElementTagClose(s!) ||
         isElementTagSelfClose(s!)
     );
@@ -120,7 +121,7 @@ export function readAttributes(
         .getPositionDetail();
       parseAttrError.message = `Tag <${
         node.tagName
-      } ...> attribute name has unexpect token '${stream.current}'`;
+      } ...> attribute name has unexpected token '${stream.current}'`;
       throw parseAttrError;
     }
     // 跳过空白

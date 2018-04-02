@@ -31,7 +31,7 @@ describe('ParseAsComment', () => {
 
   test('ParseAsComment::parseAsComment', () => {
     const n1 = parseAsComment(s2);
-    const error = new ParseError(`[0:${c1.length}]: Unexpected end`);
+    const error = new ParseError(`Unexpected end`);
 
     expect(n1.content).toBe(c1);
     expect(s2.pos).toBe(s2.content.length);
