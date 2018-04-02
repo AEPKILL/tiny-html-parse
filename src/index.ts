@@ -8,4 +8,14 @@ export {
 } from './tiny-html-element-node';
 export { TinyHtmlTextNode, isTinyHtmlTextNode } from './tiny-html-text-node';
 export { TinyHtmlNode } from './tiny-html-node';
-export { parseString } from './parse/index';
+export { parseString, parseStream } from './parse/index';
+export {
+  isCommentTagStart,
+  default as parseAsComment
+} from './parse/parse-as-comment';
+export { isTextStart, default as parseAsText } from './parse/parse-as-text';
+export {
+  isElementTagBeginStart,
+  default as parseAsElement
+} from './parse/parse-as-element';
+export { StringStream } from './parse/string-stream';

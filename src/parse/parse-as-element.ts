@@ -6,7 +6,7 @@ import { StringStream } from './string-stream';
 import { isQuote, isWhitespace } from './token';
 
 const elementTagStartReg = /[a-zA-Z]/;
-const elementTagContentReg = /[a-zA-Z]-/;
+const elementTagContentReg = /[0-9a-zA-Z]-/;
 
 export function isElementTagBeginStart(stream: StringStream) {
   const { content, pos } = stream;
@@ -16,31 +16,38 @@ export function isElementTagBeginStart(stream: StringStream) {
 export default function parseAsElement(stream: StringStream) {
   const position = stream.getPositionDetail();
   const node = new TinyHtmlElementNode(readElementTagBeginName(stream));
+  const error = new ParseError();
+  let closed = false;
 
   node.meta.position = position;
 
+  // 解析属性
   readAttributes(stream, node);
 
+  // 标签自闭合
   if (isElementTagSelfClose(stream)) {
     stream.skip(2);
     return node;
   }
 
+  // 跳过闭合符号 >
   stream.skip();
 
-  const error = new ParseError();
-
+  // 解析 Children
   while (!stream.done) {
-    error.errorStart = stream.getPositionDetail();
+    error.errorStart = node.meta.position;
+
+    // 解析到标签闭合
     if (isElementTagEndStart(stream)) {
       const tagName = readElementTagEndName(stream);
       if (tagName !== node.tagName) {
         error.errorEnd = stream.getPositionDetail();
-        error.message = `[${node.meta.position.line}:${
-          node.meta.position.col
+        error.message = `[${error.errorStart.line}:${
+          error.errorStart.col
         }]: Tagname (${node.tagName}) mismatch`;
         throw error;
       }
+      closed = true;
       break;
     }
     if (isTextStart(stream)) {
@@ -50,6 +57,16 @@ export default function parseAsElement(stream: StringStream) {
     } else if (isElementTagBeginStart(stream)) {
       node.appendChild(parseAsElement(stream));
     }
+  }
+
+  // 标签未闭合
+  if (!closed) {
+    error.errorStart = node.meta.position!;
+    error.errorEnd = stream.getPositionDetail();
+    error.message = `[${error.errorEnd.line}:${
+      error.errorEnd.col
+    }]: Unexpected end, tag (${node.tagName}) not close.`;
+    throw error;
   }
 
   return node;
@@ -75,14 +92,16 @@ function readElementTagBeginName(stream: StringStream) {
 }
 
 function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
-  const error = new ParseError();
-  error.errorStart = stream.getPositionDetail();
   while (true) {
     stream.skipWhitespace();
 
     if (stream.done) {
+      const error = new ParseError();
+      error.errorStart = node.meta.position!;
       error.errorEnd = stream.getPositionDetail();
-      error.message = `[${stream.line}:${stream.col}]: Unexpected end`;
+      error.message = `[${stream.line}:${stream.col}]:Tag (${
+        node.tagName
+      }) unexpected end`;
       throw error;
     }
 
@@ -99,8 +118,6 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
         isElementTagSelfClose(s!)
     );
 
-    parseAttrItemError.errorStart = stream.getPositionDetail();
-
     if (stream.done) {
       continue;
     }
@@ -109,12 +126,17 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       stream.skipWhitespace();
     }
 
+    // 完成对没有值的属性解析，例如 <checkbox checked/> 中的 checked
     if (stream.current !== '=') {
       node.attributes[attrName] = '';
       continue;
     }
 
+    // 跳过等号
     stream.skip();
+
+    // 开始解析 Attritube Vaule
+    parseAttrItemError.errorStart = stream.getPositionDetail();
 
     if (isWhitespace(stream.current)) {
       stream.skipWhitespace();
@@ -122,6 +144,7 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
 
     const quote = stream.current;
 
+    // 属性值必须以引号开头 " 或者 '
     if (!isQuote(quote)) {
       stream.skipWhitespace();
       parseAttrItemError.errorEnd = stream.getPositionDetail();
@@ -131,10 +154,13 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       throw parseAttrItemError;
     }
 
+    // 跳过引号
     stream.skip();
 
+    // 解析值
     node.attributes[attrName] = stream.readEscaped(quote);
 
+    // 属性值必须以同等的引号结尾
     if (!isQuote(stream.current)) {
       parseAttrItemError.errorEnd = stream.getPositionDetail();
       parseAttrItemError.message = `[${parseAttrItemError.errorStart.line}:${
@@ -143,15 +169,18 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       throw parseAttrItemError;
     }
 
+    // 跳过引号
     stream.skip();
   }
 }
 
 function readElementTagEndName(stream: StringStream) {
   const error = new ParseError();
+  let tagName = '';
+
   error.errorStart = stream.getPositionDetail();
   stream.skip(2);
-  const tagName = readElemetTagName(stream);
+  tagName = readElemetTagName(stream);
 
   if (tagName.length <= 0) {
     error.errorEnd = stream.getPositionDetail();
@@ -176,8 +205,9 @@ function readElementTagEndName(stream: StringStream) {
 
 function readElemetTagName(stream: StringStream) {
   let tagName = '';
-  tagName = stream.readEscaped(ch => !/[0-9a-zA-z]/.test(ch));
-  tagName += stream.readEscaped(ch => !/[0-9a-zA-z-]/.test(ch));
+
+  tagName = stream.readEscaped(ch => !elementTagStartReg.test(ch));
+  tagName += stream.readEscaped(ch => !elementTagContentReg.test(ch));
   return tagName;
 }
 

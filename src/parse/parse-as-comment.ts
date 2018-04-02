@@ -22,8 +22,8 @@ export function isCommentEndTag(stream: StringStream) {
 export default function parseAsComment(stream: StringStream) {
   const error = new ParseError('');
   let content = '';
-  stream.skip(4);
   error.errorStart = stream.getPositionDetail();
+  stream.skip(4);
   while (true) {
     if (isCommentEndTag(stream)) {
       stream.skip(3);
