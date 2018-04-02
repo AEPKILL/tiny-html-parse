@@ -7,8 +7,16 @@ export function isTextStart(stream: StringStream) {
 
 export default function parseAsText(stream: StringStream) {
   const position = stream.getPositionDetail();
-  const content = stream.readEscaped('<');
-  const node = new TinyHtmlTextNode(content);
+  let content = '';
+  let node: TinyHtmlTextNode;
+  while (!stream.done) {
+    if (stream.current === '<') {
+      break;
+    }
+    content += stream.current;
+    stream.next();
+  }
+  node = new TinyHtmlTextNode(content);
   node.meta.position = position;
   return node;
 }

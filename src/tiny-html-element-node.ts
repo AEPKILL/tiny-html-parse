@@ -54,12 +54,14 @@ export class TinyHtmlElementNode extends TinyHtmlNode {
     const pre = children[index - 1];
     const next = children[index + 1];
     if (pre) {
-      TinyHtmlNode.setNext(pre, next);
+      TinyHtmlNode.setNext(pre, next || null);
     }
     if (next) {
-      TinyHtmlNode.setPre(next, pre);
+      TinyHtmlNode.setPre(next, pre || null);
     }
     TinyHtmlNode.setParent(node, null);
+    TinyHtmlNode.setNext(node, null);
+    TinyHtmlNode.setPre(node, null);
     children.splice(index, 1);
   }
   cloneNode() {

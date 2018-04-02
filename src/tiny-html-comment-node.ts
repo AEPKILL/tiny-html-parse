@@ -21,12 +21,12 @@ export class TinyHtmlCommentNode extends TinyHtmlNode {
     };
   }
   toString() {
-    return `<!-- ${this.content} -->`;
+    return `<!--${this.content}-->`;
   }
-  static isTinyCommentNode = isTinyCommentNode;
+  static isTinyHtmlCommentNode = isTinyHtmlCommentNode;
 }
 
-export function isTinyCommentNode(
+export function isTinyHtmlCommentNode(
   node: TinyHtmlNode
 ): node is TinyHtmlCommentNode {
   return node && node.nodeType === NODE_TYPE.COMMENT;

@@ -119,7 +119,7 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
       const error = new ParseError();
       error.errorStart = node.meta.position!;
       error.errorEnd = stream.getPositionDetail();
-      error.message = `[${stream.line}:${stream.col}]:Tag (${
+      error.message = `[${stream.line}:${stream.col}]: Tag (${
         node.tagName
       }) unexpected end`;
       throw error;
@@ -155,18 +155,17 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
     // 跳过等号
     stream.skip();
 
-    // 开始解析 Attritube Vaule
-    parseAttrItemError.errorStart = stream.getPositionDetail();
-
     if (isWhitespace(stream.current)) {
       stream.skipWhitespace();
     }
+
+    // 开始解析 Attritube Vaule
+    parseAttrItemError.errorStart = stream.getPositionDetail();
 
     const quote = stream.current;
 
     // 属性值必须以引号开头 " 或者 '
     if (!isQuote(quote)) {
-      stream.skipWhitespace();
       parseAttrItemError.errorEnd = stream.getPositionDetail();
       parseAttrItemError.message = `[${parseAttrItemError.errorStart.line}:${
         parseAttrItemError.errorStart.col
@@ -183,8 +182,8 @@ function readAttributes(stream: StringStream, node: TinyHtmlElementNode) {
     // 属性值必须以同等的引号结尾
     if (!isQuote(stream.current)) {
       parseAttrItemError.errorEnd = stream.getPositionDetail();
-      parseAttrItemError.message = `[${parseAttrItemError.errorStart.line}:${
-        parseAttrItemError.errorStart.col
+      parseAttrItemError.message = `[${parseAttrItemError.errorEnd.line}:${
+        parseAttrItemError.errorEnd.col
       }]: Attribute (${attrName}) expected a end quote`;
       throw parseAttrItemError;
     }
@@ -213,7 +212,7 @@ export function readElementTagEndName(stream: StringStream) {
 
   if (stream.current !== '>') {
     error.errorEnd = stream.getPositionDetail();
-    error.message = `[${stream.line}:${stream.col}]: Tag end expected '>' `;
+    error.message = `[${stream.line}:${stream.col}]: Tag end expected '>'`;
     throw error;
   }
 

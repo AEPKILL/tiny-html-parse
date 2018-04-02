@@ -1,6 +1,6 @@
 export {
   TinyHtmlCommentNode,
-  isTinyCommentNode
+  isTinyHtmlCommentNode
 } from './tiny-html-comment-node';
 export {
   TinyHtmlElementNode,
