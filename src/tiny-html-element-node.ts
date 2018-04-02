@@ -94,11 +94,10 @@ export class TinyHtmlElementNode extends TinyHtmlNode {
     }
     return json;
   }
-  toString() {
-    let result = `<${this.tagName}`;
+  getAttributeString() {
     const attrsKeys = Object.keys(this.attributes);
     if (attrsKeys.length) {
-      result = `${result} ${attrsKeys
+      return ` ${attrsKeys
         .reduce(
           (attrs, key) => {
             const value = this._attributes[key];
@@ -109,7 +108,10 @@ export class TinyHtmlElementNode extends TinyHtmlNode {
         )
         .join(' ')}`;
     }
-    result = `${result}>`;
+    return '';
+  }
+  toString() {
+    let result = `<${this.tagName}${this.getAttributeString()}>`;
     for (const child of this.children) {
       result = `${result}${child.toString()}`;
     }

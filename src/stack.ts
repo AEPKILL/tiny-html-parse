@@ -1,11 +1,7 @@
 export class Stack<T> {
   private _stack: T[] = [];
-  get top() {
-    if (this.isEmpty()) {
-      return null;
-    } else {
-      return this._stack[this._stack.length - 1] as T;
-    }
+  get top(): T | undefined {
+    return this._stack[this._stack.length - 1];
   }
   isEmpty() {
     return this._stack.length == 0;
@@ -13,7 +9,7 @@ export class Stack<T> {
   push(value: T) {
     this._stack.push(value);
   }
-  pop() {
+  pop(): T | undefined {
     return this._stack.pop();
   }
 }

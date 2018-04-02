@@ -1,11 +1,18 @@
+import { TinyHtmlElementNode } from '..';
+import { Stack } from '../stack';
 import { TinyHtmlNode } from '../tiny-html-node';
 import parseAsComment, { isCommentTagStart } from './parse-as-comment';
-import parseAsElement, { isElementTagBeginStart } from './parse-as-element';
+import parseAsElement, {
+  isElementTagBeginStart,
+  isElementTagEndStart,
+  readElementTagEndName
+} from './parse-as-element';
 import parseAsText, { isTextStart } from './parse-as-text';
+import ParseError from './parse-error';
 import { StringStream } from './string-stream';
 
 export interface ParseOptions {
-  skipWhitespaceText?: boolean;
+  skipWhitespace?: boolean;
 }
 
 export function parseString(content: string, option?: ParseOptions) {
@@ -14,20 +21,91 @@ export function parseString(content: string, option?: ParseOptions) {
 }
 
 export function parseStream(stream: StringStream, option: ParseOptions = {}) {
-  const { skipWhitespaceText } = option;
+  const { skipWhitespace } = option;
   const nodes: TinyHtmlNode[] = [];
+  const stack = new Stack<TinyHtmlElementNode>();
+  const error = new ParseError();
+
   while (!stream.done) {
-    if (skipWhitespaceText) {
+    if (skipWhitespace) {
       stream.skipWhitespace();
     }
     if (isTextStart(stream)) {
-      nodes.push(parseAsText(stream));
+      if (stack.isEmpty()) {
+        nodes.push(parseAsText(stream));
+      } else {
+        stack.top!.appendChild(parseAsText(stream));
+      }
     } else if (isCommentTagStart(stream)) {
-      nodes.push(parseAsComment(stream));
+      if (stack.isEmpty()) {
+        nodes.push(parseAsComment(stream));
+      } else {
+        stack.top!.appendChild(parseAsComment(stream));
+      }
     } else if (isElementTagBeginStart(stream)) {
-      nodes.push(parseAsElement(stream, option));
+      const result = parseAsElement(stream);
+      const { close, node } = result;
+      if (stack.isEmpty()) {
+        if (close) {
+          nodes.push(node);
+        } else {
+          stack.push(node);
+        }
+      } else {
+        if (close) {
+          stack.top!.appendChild(node);
+        } else {
+          stack.push(node);
+        }
+      }
+    } else if (isElementTagEndStart(stream)) {
+      error.errorStart = stream.getPositionDetail();
+      const tagName = readElementTagEndName(stream);
+      const node = stack.top!;
+      if (skipWhitespace) {
+        stream.skipWhitespace();
+      }
+      if (stack.isEmpty()) {
+        error.errorEnd = stream.getPositionDetail();
+        error.message = `[${error.errorEnd.line}:${
+          error.errorEnd.col
+        }]: Unexpect close tag ${tagName}.`;
+        throw error;
+      }
+      if (tagName !== node.tagName) {
+        error.errorEnd = stream.getPositionDetail();
+        error.message = `[${error.errorStart.line}:${
+          error.errorStart.col
+        }]: Tag name mismatch (<${node.tagName} ...>*</${tagName}>)`;
+        throw error;
+      }
+      const top = stack.pop()!;
+      if (stack.isEmpty()) {
+        nodes.push(top);
+      }
+    } else {
+      error.errorStart = stream.getPositionDetail();
+      error.errorEnd = stream
+        .clone()
+        .skip()
+        .getPositionDetail();
+      error.message = `[${error.errorStart.line}:${
+        error.errorStart.col
+      }]: Unexpect token (${stream.current})`;
+      throw error;
     }
   }
+
+  if (!stack.isEmpty()) {
+    const node = stack.top!;
+    error.errorStart = node.meta.position!;
+    error.errorEnd = stream.getPositionDetail();
+    error.message = `[${error.errorStart.line}:${
+      error.errorStart.col
+    }]: Tag (<${node.tagName}${node.getAttributeString()}>) not close`;
+    throw error;
+  }
+
   return nodes;
 }
 

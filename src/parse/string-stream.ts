@@ -52,6 +52,7 @@ export class StringStream {
       value--;
       this.next();
     }
+    return this;
   }
   getPositionDetail() {
     return {
@@ -67,6 +68,7 @@ export class StringStream {
       }
       this.next();
     }
+    return this;
   }
   readEscaped(end: ((ch: string, stream?: StringStream) => boolean) | string) {
     const endTest =

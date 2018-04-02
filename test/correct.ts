@@ -8,11 +8,11 @@ describe('site test', () => {
   test('zhihu', () => {
     expect(() =>
       parseString(zhihu, {
-        skipWhitespaceText: true
+        skipWhitespace: true
       })
     ).not.toThrow();
     const nZhihu = parseString(zhihu, {
-      skipWhitespaceText: true
+      skipWhitespace: true
     })[0] as TinyHtmlElementNode;
     expect(nZhihu.tagName).toBe('body');
     expect((nZhihu.children[0] as TinyHtmlElementNode).attributes.id).toBe(

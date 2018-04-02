@@ -12,6 +12,7 @@ export default function parseAsTextContentElement(
   let text = '';
   while (!stream.done) {
     if (isElementTagEndStart(stream)) {
+      // 尝试读取 tagEndName
       try {
         const tempStream = stream.clone();
         const tagName = readElementTagEndName(tempStream);
