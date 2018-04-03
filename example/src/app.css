@@ -1,0 +1,32 @@
+body,
+html,
+#root,
+.tiny-html-parse {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.tiny-html-parse {
+  position: relative;
+}
+.inspector-wrapper,
+.editor-wrapper {
+  height: 100%;
+  width: 50%;
+  float: left;
+}
+.error-message {
+  position: absolute;
+  background: red;
+  color: #fff;
+  width: 100%;
+  height: 25px;
+}
+.error-message.hide {
+  top: 100%;
+}
+.error-message.show {
+  top: calc(100% - 25px);
+}

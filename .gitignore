@@ -4,5 +4,7 @@ coverage/
 .ref/
 .vscode/
 
+/example/dist/
+
 package-lock.json
 *.log

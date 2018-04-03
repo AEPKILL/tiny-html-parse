@@ -52,7 +52,7 @@
       "check-else",
       "check-whitespace"
     ],
-    "quotemark": [true, "single"],
+    "quotemark": [true, "single" , "jsx-double"],
     "radix": true,
     "semicolon": [true, "always"],
     "triple-equals": [false],

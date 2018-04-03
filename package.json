@@ -7,18 +7,51 @@
   "scripts": {
     "test": "jest --config=jest.json",
     "build": "tsc --project tsconfig.json",
-    "demo": ""
+    "start": "webpack-dev-server --config=./example/webpack.config.js --mode development --hot --progress --color --port 3000 --open",
+    "build:demo": "webpack --config=./example/webpack.config.js -p --progress --colors"
   },
-  "keywords": ["html parse"],
+  "keywords": [
+    "html parse"
+  ],
   "author": "AEPKILL",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^22.2.2",
     "@types/node": "^9.6.1",
+    "@types/react": "^16.3.1",
+    "@types/react-dom": "^16.0.4",
+    "@types/react-monaco-editor": "^0.10.1",
+    "copy-webpack-plugin": "^4.5.1",
+    "cross-env": "^5.1.4",
+    "css-loader": "^0.28.10",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^1.1.11",
+    "html-loader": "^1.0.0-alpha.0",
+    "html-webpack-plugin": "^3.0.4",
     "jest": "^22.4.3",
+    "postcss": "^6.0.19",
+    "postcss-browser-reporter": "^0.5.0",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-import": "^11.1.0",
+    "postcss-loader": "^2.1.1",
+    "postcss-reporter": "^5.0.0",
+    "postcss-url": "^7.3.1",
+    "prettier": "^1.11.1",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0",
+    "react-json-inspector": "^7.1.1",
+    "react-monaco-editor": "^0.14.1",
+    "redux-devtools-extension": "^2.13.2",
+    "style-loader": "^0.20.2",
     "ts-jest": "^22.4.2",
+    "ts-loader": "^4.0.0",
     "ts-node": "^5.0.1",
-    "typescript": "^2.8.1"
+    "typescript": "^2.8.1",
+    "url-loader": "^1.0.0-beta.0",
+    "webpack": "^4.0.1",
+    "webpack-cleanup-plugin": "^0.5.1",
+    "webpack-cli": "^2.0.10",
+    "webpack-dev-server": "^3.1.0"
   },
   "dependencies": {
     "tslib": "^1.9.0"

@@ -1,7 +1,4 @@
 import TinyHtmlElementNode from '../tiny-html-element-node';
-import { ParseOptions } from './index';
-import parseAsComment, { isCommentTagStart } from './parse-as-comment';
-import parseAsText, { isTextStart } from './parse-as-text';
 import parseAsTextContentElement from './parse-as-text-content-element';
 import ParseError from './parse-error';
 import { StringStream } from './string-stream';
@@ -69,7 +66,6 @@ export default function parseAsElement(stream: StringStream) {
 }
 
 export function readElementTagBeginName(stream: StringStream) {
-  const error = new ParseError('');
   let tagName = '';
   // skip '<'
   stream.skip();
