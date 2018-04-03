@@ -1,4 +1,4 @@
-export { default as ParseError, ParsePosition } from '../lib/parse/parse-error';
+export { default as ParseError, ParsePosition } from './parse/parse-error';
 export {
   TinyHtmlCommentNode,
   isTinyHtmlCommentNode
