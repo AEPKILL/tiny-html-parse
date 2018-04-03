@@ -23,6 +23,7 @@ html,
   color: #fff;
   width: 100%;
   height: 25px;
+  transition: top .5s;
 }
 .error-message.hide {
   top: 100%;

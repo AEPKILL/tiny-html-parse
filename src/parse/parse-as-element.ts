@@ -197,7 +197,7 @@ export function readElemetTagName(stream: StringStream) {
   const position = stream.getPositionDetail();
   tagName = stream.readEscaped(ch => !elementTagStartReg.test(ch));
   tagName += stream.readEscaped(ch => !elementTagContentReg.test(ch));
-  if (stream.current !== ' ' && stream.current !== '>') {
+  if (!stream.done && stream.current !== ' ' && stream.current !== '>') {
     const error = new ParseError();
     error.errorStart = position;
     error.messagePositon = stream.getPositionDetail();
