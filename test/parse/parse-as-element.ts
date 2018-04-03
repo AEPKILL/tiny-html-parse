@@ -44,6 +44,7 @@ describe('ParseAsElement', () => {
     );
 
     error = getParseError('<div id=23333>');
+    expect(error.messagePositon).toEqual(error.errorStart);
     expect(error.errorStart.pos).toBe(5);
     expect(error.errorEnd.pos).toBe(8);
     expect(getRealMessage(error)).toBe(
@@ -56,6 +57,7 @@ describe('ParseAsElement', () => {
     expect(getRealMessage(error)).toBe(`Token '!' can't be tag name`);
 
     error = getParseError('<div id="23333>');
+    expect(error.messagePositon).toEqual(error.errorStart);
     expect(error.errorStart.pos).toBe(5);
     expect(error.errorEnd.pos).toBe(15);
     expect(getRealMessage(error)).toBe(

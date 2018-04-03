@@ -149,6 +149,7 @@ export function readAttributes(
 
     // 属性值必须以同等的引号结尾
     if (!isQuote(stream.current)) {
+      parseAttrError.messagePositon = parseAttrError.errorStart;
       parseAttrError.errorEnd = stream.getPositionDetail();
       parseAttrError.message = `Tag ${
         node.tagName
