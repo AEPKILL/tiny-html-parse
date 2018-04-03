@@ -29,10 +29,12 @@ describe('ParseAsElement', () => {
     ).toEqual(node.attributes);
 
     expect(parseElement(`<input />`).close).toBe(true);
+    expect(parseElement(`<input/>`).close).toBe(true);
+    expect(parseElement('<div></div>').close).toBe(false);
+
     expect(
       parseElement('<script>const xxx="<div>fuck</div>"</script>').close
     ).toBe(true);
-    expect(parseElement('<div></div>').close).toBe(false);
   });
 
   test('illegal tag', () => {

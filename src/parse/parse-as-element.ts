@@ -102,7 +102,6 @@ export function readAttributes(
         ch === '=' ||
         ch === '<' ||
         ch === '>' ||
-        isElementTagClose(s!) ||
         isElementTagSelfClose(s!)
     );
 
@@ -198,7 +197,12 @@ export function readElemetTagName(stream: StringStream) {
   const position = stream.getPositionDetail();
   tagName = stream.readEscaped(ch => !elementTagStartReg.test(ch));
   tagName += stream.readEscaped(ch => !elementTagContentReg.test(ch));
-  if (!stream.done && stream.current !== ' ' && stream.current !== '>') {
+  if (
+    !stream.done &&
+    stream.current !== ' ' &&
+    !isElementTagClose(stream) &&
+    !isElementTagSelfClose(stream)
+  ) {
     const error = new ParseError();
     error.errorStart = position;
     error.messagePositon = stream.getPositionDetail();
