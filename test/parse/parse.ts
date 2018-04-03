@@ -40,9 +40,6 @@ describe('parse', () => {
 
   test('illegal', () => {
     let error = getParseError('<div><');
-    expect(error.errorStart.pos).toBe(5);
-    expect(error.errorEnd.pos).toBe(5);
-    expect(getRealMessage(error)).toBe(`Unexpected token '<'`);
 
     error = getParseError('<div><span></span>');
     expect(error.errorStart.pos).toBe(0);

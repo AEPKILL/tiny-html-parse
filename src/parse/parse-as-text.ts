@@ -1,8 +1,17 @@
 import TinyHtmlTextNode from '../tiny-html-text-node';
+import { isCommentTagStart } from './parse-as-comment';
+import {
+  isElementTagBeginStart,
+  isElementTagEndStart
+} from './parse-as-element';
 import { StringStream } from './string-stream';
 
 export function isTextStart(stream: StringStream) {
-  return stream.current !== '<';
+  return !(
+    isElementTagBeginStart(stream) ||
+    isCommentTagStart(stream) ||
+    isElementTagEndStart(stream)
+  );
 }
 
 export default function parseAsText(stream: StringStream) {
@@ -14,7 +23,7 @@ export default function parseAsText(stream: StringStream) {
   // <div>\</div> 这种情况会识别错误
 
   while (!stream.done) {
-    if (stream.current === '<') {
+    if (stream.current === '<' && !isTextStart(stream)) {
       break;
     }
     content += stream.current;
