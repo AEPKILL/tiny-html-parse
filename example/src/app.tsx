@@ -22,16 +22,19 @@ interface AppState {
   nodes: TinyHtmlNode[];
   error?: ParseError;
   content: string;
+  editorLoaded: boolean;
 }
 
 export default class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
-    this.onChange = this.onChange.bind(this);
     this.state = {
       nodes: parseString(template),
-      content: template
+      content: template,
+      editorLoaded: false
     };
+    this.onChange = this.onChange.bind(this);
+    this.onEditorLoaded = this.onEditorLoaded.bind(this);
   }
   onChange(content: string) {
     this.setState({ content });
@@ -42,10 +45,17 @@ export default class App extends React.Component<{}, AppState> {
       this.setState({ error: e, nodes: [] });
     }
   }
+  onEditorLoaded() {
+    this.setState({ editorLoaded: true });
+  }
   render() {
+    const editorLoadTips = this.state.editorLoaded ? null : (
+      <div className="editor-load-tips"> loading editor </div>
+    );
     return (
       <div className="tiny-html-parse">
         <div className="editor-wrapper">
+          {editorLoadTips}
           <MonacoEditor
             language="html"
             theme="vs-light"
@@ -55,6 +65,7 @@ export default class App extends React.Component<{}, AppState> {
             requireConfig={requireConfig}
             options={{ minimap: { enabled: false }, automaticLayout: true }}
             onChange={this.onChange}
+            editorDidMount={this.onEditorLoaded}
           />
         </div>
         <div className="inspector-wrapper">

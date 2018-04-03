@@ -2,7 +2,7 @@ import TinyHtmlTextNode from '../tiny-html-text-node';
 import { StringStream } from './string-stream';
 
 export function isTextStart(stream: StringStream) {
-  return !stream.done && stream.current !== '<';
+  return stream.current !== '<';
 }
 
 export default function parseAsText(stream: StringStream) {

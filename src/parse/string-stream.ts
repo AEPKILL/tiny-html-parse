@@ -38,7 +38,7 @@ export class StringStream {
     return stream;
   }
   next(): string | undefined {
-    const ch = this._content[++this._pos];
+    const ch = this._content[this._pos++];
     if (isBreakLine(ch)) {
       this._line++;
       this._col = 0;

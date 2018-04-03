@@ -30,3 +30,8 @@ html,
 .error-message.show {
   top: calc(100% - 25px);
 }
+.editor-load-tips {
+  text-align: center;
+  color: #888;
+  margin-top: 50px;
+}
