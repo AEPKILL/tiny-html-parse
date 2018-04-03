@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "tiny html parse",
   "main": "./lib/index.js",
+  "typings": "./lib/index.d.js",
   "scripts": {
-    "test": "jest --config=jest.json"
+    "test": "jest --config=jest.json",
+    "build": "tsc --project tsconfig.json",
+    "demo": ""
   },
-  "keywords": [],
+  "keywords": ["html parse"],
   "author": "AEPKILL",
   "license": "MIT",
   "devDependencies": {
@@ -14,12 +17,10 @@
     "@types/node": "^9.6.1",
     "jest": "^22.4.3",
     "ts-jest": "^22.4.2",
+    "ts-node": "^5.0.1",
     "typescript": "^2.8.1"
   },
   "dependencies": {
-    "@types/htmlparser2": "^3.7.31",
-    "htmlparser2": "^3.9.2",
-    "ts-node": "^5.0.1",
     "tslib": "^1.9.0"
   }
 }

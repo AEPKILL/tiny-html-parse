@@ -1,3 +1,4 @@
+export { default as ParseError, ParsePosition } from '../lib/parse/parse-error';
 export {
   TinyHtmlCommentNode,
   isTinyHtmlCommentNode
@@ -7,7 +8,7 @@ export {
   isTinyHtmlElementNode
 } from './tiny-html-element-node';
 export { TinyHtmlTextNode, isTinyHtmlTextNode } from './tiny-html-text-node';
-export { TinyHtmlNode } from './tiny-html-node';
+export { TinyHtmlNode, NODE_TYPE } from './tiny-html-node';
 export { parseString, parseStream, ParseOptions } from './parse/index';
 export {
   isCommentTagStart,

@@ -3,7 +3,7 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es5",
     "importHelpers": true,
     "outDir": "./lib/",
     "sourceMap": true,
