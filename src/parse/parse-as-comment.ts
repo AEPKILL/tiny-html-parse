@@ -31,7 +31,7 @@ export default function parseAsComment(stream: StringStream) {
     }
     if (stream.done) {
       error.errorEnd = stream.getPositionDetail();
-      error.message = `Unexpected end`;
+      error.message = `Comment tag has unexpected end`;
       throw error;
     }
     content += stream.current;

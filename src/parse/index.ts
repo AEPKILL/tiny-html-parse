@@ -26,9 +26,12 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
   const stack = new Stack<TinyHtmlElementNode>();
   const error = new ParseError();
 
-  while (!stream.done) {
+  while (true) {
     if (skipWhitespace) {
       stream.skipWhitespace();
+    }
+    if (stream.done) {
+      break;
     }
     if (isTextStart(stream)) {
       if (stack.isEmpty()) {
@@ -63,15 +66,15 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
       const node = stack.top!;
       if (stack.isEmpty()) {
         error.errorEnd = stream.getPositionDetail();
-        error.message = `Unexpected close tag ${tagName}`;
+        error.message = `Unexpected close tag '</${tagName}>'`;
         throw error;
       }
       if (tagName !== node.tagName) {
+        error.errorStart = node.meta.position!;
         error.errorEnd = stream.getPositionDetail();
-        error.messagePositon = error.errorStart;
-        error.message = `Tag name mismatch (<${
+        error.message = `Tag name mismatch '<${
           node.tagName
-        }${node.getAttributeString()}>...</${tagName}>)`;
+        }${node.getAttributeString()}>...</${tagName}>'`;
         throw error;
       }
       const top = stack.pop()!;
@@ -80,22 +83,16 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
       }
     } else {
       error.errorStart = stream.getPositionDetail();
-      error.errorEnd = stream
-        .clone()
-        .skip()
-        .getPositionDetail();
-      error.messagePositon = error.errorStart;
-      error.message = `Unexpected token (${stream.current})`;
+      error.errorEnd = error.errorStart;
+      error.message = `Unexpected token '${stream.current}'`;
       throw error;
-    }
-    if (skipWhitespace) {
-      stream.skipWhitespace();
     }
   }
 
   if (!stack.isEmpty()) {
     const node = stack.top!;
-    error.messagePositon = error.errorStart = node.meta.position!;
+    error.messagePositon = node.meta.position!;
+    error.errorStart = node.meta.position!;
     error.errorEnd = stream.getPositionDetail();
     error.message = `Tag <${
       node.tagName

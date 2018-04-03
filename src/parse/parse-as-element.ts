@@ -12,7 +12,12 @@ const elementTagContentReg = /[0-9a-zA-Z_-]/;
 
 export function isElementTagBeginStart(stream: StringStream) {
   const { content, pos } = stream;
-  return stream.current === '<' && elementTagStartReg.test(content[pos + 1]);
+  // /[0-9a-zA-Z_-]/.test(undefined) === true
+  return (
+    stream.current === '<' &&
+    content[pos + 1] != undefined &&
+    elementTagStartReg.test(content[pos + 1])
+  );
 }
 
 export default function parseAsElement(stream: StringStream) {
@@ -66,17 +71,9 @@ export default function parseAsElement(stream: StringStream) {
 export function readElementTagBeginName(stream: StringStream) {
   const error = new ParseError('');
   let tagName = '';
-
-  error.errorStart = stream.getPositionDetail();
+  // skip '<'
   stream.skip();
   tagName = readElemetTagName(stream);
-
-  if (tagName.length <= 0) {
-    error.errorEnd = stream.getPositionDetail();
-    error.message = `Tag begin name can't be empty`;
-    throw error;
-  }
-
   return tagName;
 }
 
@@ -114,11 +111,8 @@ export function readAttributes(
     );
 
     if (attrName.length === 0) {
-      parseAttrError.messagePositon = parseAttrError.errorStart = stream.getPositionDetail();
-      parseAttrError.errorEnd = stream
-        .clone()
-        .skip()
-        .getPositionDetail();
+      parseAttrError.errorStart = stream.getPositionDetail();
+      parseAttrError.errorEnd = parseAttrError.errorStart;
       parseAttrError.message = `Tag <${
         node.tagName
       } ...> attribute name has unexpected token '${stream.current}'`;
@@ -144,13 +138,10 @@ export function readAttributes(
     // 属性值必须以引号开头 " 或者 '
     if (!isQuote(quotes)) {
       parseAttrError.messagePositon = parseAttrError.errorStart;
-      parseAttrError.errorEnd = stream
-        .clone()
-        .skip()
-        .getPositionDetail();
+      parseAttrError.errorEnd = stream.getPositionDetail();
       parseAttrError.message = `Tag ${
         node.tagName
-      } attribute (${attrName}) expect a start quotes`;
+      } attribute '${attrName}' required a start quotes`;
       throw parseAttrError;
     }
 
@@ -165,7 +156,7 @@ export function readAttributes(
       parseAttrError.errorEnd = stream.getPositionDetail();
       parseAttrError.message = `Tag ${
         node.tagName
-      } attribute (${attrName}) expects a end quotes`;
+      } attribute '${attrName}' required a end quotes`;
       throw parseAttrError;
     }
 
@@ -179,7 +170,10 @@ export function readElementTagEndName(stream: StringStream) {
   let tagName = '';
 
   error.errorStart = stream.getPositionDetail();
+
+  // skip '</'
   stream.skip(2);
+
   tagName = readElemetTagName(stream);
 
   if (tagName.length <= 0) {
@@ -192,10 +186,11 @@ export function readElementTagEndName(stream: StringStream) {
 
   if (stream.current !== '>') {
     error.errorEnd = stream.getPositionDetail();
-    error.message = `End tag (</${tagName} ...) expect '>'`;
+    error.message = `End tag (</${tagName} ...) expect token '>'`;
     throw error;
   }
 
+  // skip '>'
   stream.skip();
 
   return tagName;
