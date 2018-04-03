@@ -29,7 +29,9 @@ describe('ParseAsElement', () => {
     ).toEqual(node.attributes);
 
     expect(parseElement(`<input />`).close).toBe(true);
-    expect(parseElement('<script>const xxx="<div>fuck</div>"</script>').close).toBe(true);
+    expect(
+      parseElement('<script>const xxx="<div>fuck</div>"</script>').close
+    ).toBe(true);
     expect(parseElement('<div></div>').close).toBe(false);
   });
 
@@ -48,11 +50,21 @@ describe('ParseAsElement', () => {
       `Tag div attribute 'id' required a start quotes`
     );
 
+    error = getParseError('<div!');
+    expect(error.errorStart.pos).toBe(1);
+    expect(error.errorEnd.pos).toBe(4);
+    expect(getRealMessage(error)).toBe(`Token '!' can't be tag name`);
+
     error = getParseError('<div id="23333>');
     expect(error.errorStart.pos).toBe(5);
     expect(error.errorEnd.pos).toBe(15);
     expect(getRealMessage(error)).toBe(
       `Tag div attribute 'id' required a end quotes`
     );
+
+    error = getParseError('<script id="23333">const xxx="<div>fuck</div>"');
+    expect(error.errorStart.pos).toBe(19);
+    expect(error.errorEnd.pos).toBe(46);
+    expect(getRealMessage(error)).toBe(`Tag <script> unexpected end`);
   });
 });

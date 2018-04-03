@@ -65,6 +65,7 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
       const tagName = readElementTagEndName(stream);
       const node = stack.top!;
       if (stack.isEmpty()) {
+        error.messagePositon = error.errorStart;
         error.errorEnd = stream.getPositionDetail();
         error.message = `Unexpected close tag '</${tagName}>'`;
         throw error;

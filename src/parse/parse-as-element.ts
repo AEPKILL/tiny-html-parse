@@ -194,8 +194,17 @@ export function readElementTagEndName(stream: StringStream) {
 
 export function readElemetTagName(stream: StringStream) {
   let tagName = '';
+  const position = stream.getPositionDetail();
   tagName = stream.readEscaped(ch => !elementTagStartReg.test(ch));
   tagName += stream.readEscaped(ch => !elementTagContentReg.test(ch));
+  if (stream.current !== ' ' && stream.current !== '>') {
+    const error = new ParseError();
+    error.errorStart = position;
+    error.messagePositon = stream.getPositionDetail();
+    error.errorEnd = error.messagePositon;
+    error.message = `Token '${stream.current}' can't be tag name`;
+    throw error;
+  }
   return tagName;
 }
 
