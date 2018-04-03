@@ -52,6 +52,10 @@ try {
 }
 ```
 
+# DEMOS
+
+*  [即时解析 HTML](http://blog.aepkill.com/demos/tiny-html-parse/)
+
 # API & Class
 
 ## API
