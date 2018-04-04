@@ -9,10 +9,10 @@ const elementTagContentReg = /[0-9a-zA-Z_-]/;
 
 export function isElementTagBeginStart(stream: StringStream) {
   const { content, pos } = stream;
-  // /[0-9a-zA-Z_-]/.test(undefined) === true
+  // /[a-zA-Z_] /.test(undefined) === true
   return (
     stream.current === '<' &&
-    content[pos + 1] != undefined &&
+    !stream.done &&
     elementTagStartReg.test(content[pos + 1])
   );
 }
@@ -40,7 +40,7 @@ export default function parseAsElement(stream: StringStream) {
   stream.skip();
 
   // 特殊处理 script 和 style 标签，这两个标签的内容放入 text 字段中
-  // 这两个标签没有子标签，属于闭合标签
+  // 这两个标签没有子标签，所以一直解析到闭合为止
   switch (node.tagName.toLowerCase()) {
     case 'script': {
       parseAsTextContentElement(stream, node);
@@ -77,15 +77,13 @@ export function readAttributes(
   stream: StringStream,
   node: TinyHtmlElementNode
 ) {
-  const parseAttrError = new ParseError();
+  const error = new ParseError();
   while (true) {
-
     // 读取 attribute 未完成但字符流已终止
     if (stream.done) {
-      const error = new ParseError();
       error.errorStart = node.meta.position!;
       error.errorEnd = stream.getPositionDetail();
-      error.message = `Tag (<${node.tagName} ...) unexpected end`;
+      error.message = `Tag '<${node.tagName} ...' unexpected end`;
       throw error;
     }
 
@@ -97,7 +95,7 @@ export function readAttributes(
       break;
     }
 
-    parseAttrError.errorStart = stream.getPositionDetail();
+    error.errorStart = stream.getPositionDetail();
 
     const attrName = stream.readEscaped(
       (ch, s) =>
@@ -110,12 +108,12 @@ export function readAttributes(
 
     // 无法读取 attribute name
     if (attrName.length === 0) {
-      parseAttrError.errorStart = stream.getPositionDetail();
-      parseAttrError.errorEnd = parseAttrError.errorStart;
-      parseAttrError.message = `Tag <${
+      error.errorStart = stream.getPositionDetail();
+      error.errorEnd = error.errorStart;
+      error.message = `Tag <${
         node.tagName
       } ...> attribute name has unexpected token '${stream.current}'`;
-      throw parseAttrError;
+      throw error;
     }
 
     // 跳过空白
@@ -137,12 +135,12 @@ export function readAttributes(
 
     // 属性值必须以引号开头 (" 或者 ')
     if (!isQuote(quotes)) {
-      parseAttrError.messagePositon = parseAttrError.errorStart;
-      parseAttrError.errorEnd = stream.getPositionDetail();
-      parseAttrError.message = `Tag ${
+      error.messagePositon = error.errorStart;
+      error.errorEnd = stream.getPositionDetail();
+      error.message = `Tag ${
         node.tagName
       } attribute '${attrName}' required a start quotes`;
-      throw parseAttrError;
+      throw error;
     }
 
     // 跳过引号
@@ -153,12 +151,12 @@ export function readAttributes(
 
     // 属性值必须以同等的引号结尾
     if (!isQuote(stream.current)) {
-      parseAttrError.messagePositon = parseAttrError.errorStart;
-      parseAttrError.errorEnd = stream.getPositionDetail();
-      parseAttrError.message = `Tag ${
+      error.messagePositon = error.errorStart;
+      error.errorEnd = stream.getPositionDetail();
+      error.message = `Tag ${
         node.tagName
       } attribute '${attrName}' required a end quotes`;
-      throw parseAttrError;
+      throw error;
     }
 
     // 跳过引号
@@ -187,7 +185,7 @@ export function readElementTagEndName(stream: StringStream) {
 
   if (stream.current !== '>') {
     error.errorEnd = stream.getPositionDetail();
-    error.message = `End tag (</${tagName} ...) expect token '>'`;
+    error.message = `End tag '</${tagName} ...' expect token '>'`;
     throw error;
   }
 
@@ -200,8 +198,22 @@ export function readElementTagEndName(stream: StringStream) {
 export function readElemetTagName(stream: StringStream) {
   let tagName = '';
   const position = stream.getPositionDetail();
-  tagName = stream.readEscaped(ch => !elementTagStartReg.test(ch));
-  tagName += stream.readEscaped(ch => !elementTagContentReg.test(ch));
+  while (!stream.done) {
+    const ch = stream.current!;
+    if (!elementTagStartReg.test(ch)) {
+      break;
+    }
+    tagName += ch;
+    stream.next();
+  }
+  while (!stream.done) {
+    const ch = stream.current!;
+    if (!elementTagContentReg.test(ch)) {
+      break;
+    }
+    tagName += ch;
+    stream.next();
+  }
   if (
     !stream.done &&
     stream.current !== ' ' &&

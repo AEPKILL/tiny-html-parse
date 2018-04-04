@@ -60,12 +60,12 @@ describe('parse', () => {
     expect(getRealMessage(error)).toBe(`Unexpected close tag '</span>'`);
 
     error = getParseError('</span');
-    expect(getRealMessage(error)).toBe(`End tag (</span ...) expect token '>'`);
+    expect(getRealMessage(error)).toBe(`End tag '</span ...' expect token '>'`);
 
     error = getParseError('</');
     expect(getRealMessage(error)).toBe(`End tag name can't be empty`);
 
     error = getParseError('<div');
-    expect(getRealMessage(error)).toBe(`Tag (<div ...) unexpected end`);
+    expect(getRealMessage(error)).toBe(`Tag '<div ...' unexpected end`);
   });
 });

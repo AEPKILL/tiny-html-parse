@@ -78,13 +78,13 @@ export class StringStream {
     let str = '';
     let escaped = false;
     while (!this.done) {
-      const ch = this.current;
+      const ch = this.current!;
       if (escaped) {
         escaped = false;
         str += ch;
-      } else if (endTest(ch!, this)) {
+      } else if (endTest(ch, this)) {
         break;
-      } else if (isEscaped(ch!)) {
+      } else if (isEscaped(ch)) {
         escaped = true;
       } else {
         str += ch;
