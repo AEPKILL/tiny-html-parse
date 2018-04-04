@@ -79,14 +79,17 @@ export function readAttributes(
 ) {
   const parseAttrError = new ParseError();
   while (true) {
+
+    // 读取 attribute 未完成但字符流已终止
     if (stream.done) {
       const error = new ParseError();
       error.errorStart = node.meta.position!;
       error.errorEnd = stream.getPositionDetail();
-      error.message = `Tag <${node.tagName} ... unexpected end`;
+      error.message = `Tag (<${node.tagName} ...) unexpected end`;
       throw error;
     }
 
+    // 跳过 <tagName 后的空白
     stream.skipWhitespace();
 
     // 完成解析
@@ -105,6 +108,7 @@ export function readAttributes(
         isElementTagSelfClose(s!)
     );
 
+    // 无法读取 attribute name
     if (attrName.length === 0) {
       parseAttrError.errorStart = stream.getPositionDetail();
       parseAttrError.errorEnd = parseAttrError.errorStart;
@@ -113,6 +117,7 @@ export function readAttributes(
       } ...> attribute name has unexpected token '${stream.current}'`;
       throw parseAttrError;
     }
+
     // 跳过空白
     stream.skipWhitespace();
 
@@ -130,7 +135,7 @@ export function readAttributes(
 
     const quotes = stream.current;
 
-    // 属性值必须以引号开头 " 或者 '
+    // 属性值必须以引号开头 (" 或者 ')
     if (!isQuote(quotes)) {
       parseAttrError.messagePositon = parseAttrError.errorStart;
       parseAttrError.errorEnd = stream.getPositionDetail();

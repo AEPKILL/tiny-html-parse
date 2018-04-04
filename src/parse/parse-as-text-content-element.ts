@@ -10,9 +10,7 @@ export default function parseAsTextContentElement(
   stream: StringStream,
   node: TinyHtmlElementNode
 ) {
-  const error = new ParseError();
   let text = '';
-  error.errorStart = stream.getPositionDetail();
   while (!stream.done) {
     if (isElementTagEndStart(stream)) {
       // 尝试读取 tagEndName
@@ -25,14 +23,14 @@ export default function parseAsTextContentElement(
           return node;
         }
       } catch {
-        text += '</';
-        stream.skip(2);
+        // nothing todo
       }
-    } else {
-      text += stream.current;
     }
+    text += stream.current;
     stream.next();
   }
+  const error = new ParseError();
+  error.errorStart = node.meta.position!;
   error.errorEnd = stream.getPositionDetail();
   error.message = `Tag <${node.tagName}> unexpected end`;
   throw error;

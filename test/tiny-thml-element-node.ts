@@ -74,6 +74,9 @@ describe('TinyHtmlElementNode', () => {
 
     expect(t3.next).toBeNull();
     expect(t3.pre).toBeNull();
+
+    t1.removeChild(new TinyHtmlElementNode('div'));
+    expect(t1.children).toEqual([t3]);
   });
 
   test('TinyHtmlElementNode->toJson()', () => {

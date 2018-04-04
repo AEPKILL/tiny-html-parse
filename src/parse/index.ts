@@ -61,11 +61,12 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
         }
       }
     } else if (isElementTagEndStart(stream)) {
-      error.errorStart = stream.getPositionDetail();
+      const startPosition = stream.getPositionDetail();
       const tagName = readElementTagEndName(stream);
       const node = stack.top!;
       if (stack.isEmpty()) {
-        error.messagePositon = error.errorStart;
+        error.errorStart = startPosition;
+        error.messagePositon = startPosition;
         error.errorEnd = stream.getPositionDetail();
         error.message = `Unexpected close tag '</${tagName}>'`;
         throw error;
@@ -78,15 +79,10 @@ export function parseStream(stream: StringStream, option: ParseOptions = {}) {
         }${node.getAttributeString()}>...</${tagName}>'`;
         throw error;
       }
-      const top = stack.pop()!;
+      stack.pop();
       if (stack.isEmpty()) {
-        nodes.push(top);
+        nodes.push(node);
       }
-    } else {
-      error.errorStart = stream.getPositionDetail();
-      error.errorEnd = error.errorStart;
-      error.message = `Unexpected token '${stream.current}'`;
-      throw error;
     }
   }
 

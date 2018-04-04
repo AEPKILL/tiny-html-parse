@@ -36,6 +36,9 @@ describe('parse', () => {
 
     expect(parseElementHelper('<div></div>').nodeType).toBe(NODE_TYPE.ELEMENT);
     expect(parseElementHelper('<div></div>').tagName).toBe('div');
+    expect(parseElementHelper('<input/>').tagName).toBe('input');
+
+    expect(parseElementHelper('<div id></div>').attributes).toEqual({ id: '' });
   });
 
   test('illegal', () => {
@@ -55,5 +58,14 @@ describe('parse', () => {
     expect(error.errorStart.pos).toBe(11);
     expect(error.errorEnd.pos).toBe(18);
     expect(getRealMessage(error)).toBe(`Unexpected close tag '</span>'`);
+
+    error = getParseError('</span');
+    expect(getRealMessage(error)).toBe(`End tag (</span ...) expect token '>'`);
+
+    error = getParseError('</');
+    expect(getRealMessage(error)).toBe(`End tag name can't be empty`);
+
+    error = getParseError('<div');
+    expect(getRealMessage(error)).toBe(`Tag (<div ...) unexpected end`);
   });
 });

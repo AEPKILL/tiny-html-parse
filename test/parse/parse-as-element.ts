@@ -35,6 +35,14 @@ describe('ParseAsElement', () => {
     expect(
       parseElement('<script>const xxx="<div>fuck</div>"</script>').close
     ).toBe(true);
+    expect(
+      parseElement('<script>const xxx="<div>fuck</div>"</script>').node.text
+    ).toEqual(`const xxx="<div>fuck</div>"`);
+
+    expect(parseElement('<style>.a{color:red;}</style>').close).toBe(true);
+    expect(parseElement('<style>.a{color:red;}</style>').node.text).toBe(
+      '.a{color:red;}'
+    );
   });
 
   test('illegal tag', () => {
@@ -67,7 +75,7 @@ describe('ParseAsElement', () => {
     );
 
     error = getParseError('<script id="23333">const xxx="<div>fuck</div>"');
-    expect(error.errorStart.pos).toBe(19);
+    expect(error.errorStart.pos).toBe(0);
     expect(error.errorEnd.pos).toBe(46);
     expect(getRealMessage(error)).toBe(`Tag <script> unexpected end`);
   });
