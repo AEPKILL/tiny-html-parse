@@ -70,6 +70,26 @@ export class StringStream {
     }
     return this;
   }
+
+  readIgnoreEscaped(
+    end: ((ch: string, stream?: StringStream) => boolean) | string
+  ) {
+    const endTest =
+      typeof end === 'string'
+        ? (ch: string, stream?: StringStream) => ch === end
+        : end;
+    let str = '';
+    while (!this.done) {
+      const ch = this.current!;
+      if (endTest(ch, this)) {
+        break;
+      } else {
+        str += ch;
+      }
+      this.next();
+    }
+    return str;
+  }
   readEscaped(end: ((ch: string, stream?: StringStream) => boolean) | string) {
     const endTest =
       typeof end === 'string'

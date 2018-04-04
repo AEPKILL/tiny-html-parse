@@ -95,9 +95,10 @@ export function readAttributes(
       break;
     }
 
-    error.errorStart = stream.getPositionDetail();
+    const position = stream.getPositionDetail();
+    error.errorStart = position;
 
-    const attrName = stream.readEscaped(
+    const attrName = stream.readIgnoreEscaped(
       (ch, s) =>
         isWhitespace(ch) ||
         ch === '=' ||
@@ -106,9 +107,18 @@ export function readAttributes(
         isElementTagSelfClose(s!)
     );
 
+    if (!isWhitespace(stream.content[position.pos - 1])) {
+      // <div id="xxx" <---这里必须有一个空白分割符号
+      error.messagePositon = position;
+      error.errorEnd = stream.getPositionDetail();
+      error.message = `Tag ${
+        node.tagName
+      } attribute '${attrName}' must after a whitespace token`;
+      throw error;
+    }
+
     // 无法读取 attribute name
     if (attrName.length === 0) {
-      error.errorStart = stream.getPositionDetail();
       error.errorEnd = error.errorStart;
       error.message = `Tag <${
         node.tagName

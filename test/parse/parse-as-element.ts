@@ -74,6 +74,14 @@ describe('ParseAsElement', () => {
       `Tag div attribute 'id' required a end quotes`
     );
 
+    error = getParseError('<div id="23333"vvvvvvv>');
+    expect(error.messagePositon).toEqual(error.errorStart);
+    expect(error.errorStart.pos).toBe(15);
+    expect(error.errorEnd.pos).toBe(22);
+    expect(getRealMessage(error)).toBe(
+      `Tag div attribute 'vvvvvvv' must after a whitespace token`
+    );
+
     error = getParseError('<script id="23333">const xxx="<div>fuck</div>"');
     expect(error.errorStart.pos).toBe(0);
     expect(error.errorEnd.pos).toBe(46);
