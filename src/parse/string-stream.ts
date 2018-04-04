@@ -83,9 +83,8 @@ export class StringStream {
       const ch = this.current!;
       if (endTest(ch, this)) {
         break;
-      } else {
-        str += ch;
       }
+      str += ch;
       this.next();
     }
     return str;

@@ -96,16 +96,16 @@ export function readAttributes(
     }
 
     const position = stream.getPositionDetail();
-    error.errorStart = position;
-
     const attrName = stream.readIgnoreEscaped(
       (ch, s) =>
-        isWhitespace(ch) ||
-        ch === '=' ||
-        ch === '<' ||
-        ch === '>' ||
-        isElementTagSelfClose(s!)
+      isWhitespace(ch) ||
+      ch === '=' ||
+      ch === '<' ||
+      ch === '>' ||
+      isElementTagSelfClose(s!)
     );
+
+    error.errorStart = position;
 
     if (!isWhitespace(stream.content[position.pos - 1])) {
       // <div id="xxx" <---这里必须有一个空白分割符号
@@ -208,6 +208,8 @@ export function readElementTagEndName(stream: StringStream) {
 export function readElemetTagName(stream: StringStream) {
   let tagName = '';
   const position = stream.getPositionDetail();
+
+  // 测试 2.5M 内容，这样写比用 stream.readIgnoreEscaped 快 100ms
   while (!stream.done) {
     const ch = stream.current!;
     if (!elementTagStartReg.test(ch)) {
@@ -224,6 +226,7 @@ export function readElemetTagName(stream: StringStream) {
     tagName += ch;
     stream.next();
   }
+
   if (
     !stream.done &&
     stream.current !== ' ' &&
@@ -237,6 +240,7 @@ export function readElemetTagName(stream: StringStream) {
     error.message = `Token '${stream.current}' can't be tag name`;
     throw error;
   }
+
   return tagName;
 }
 
