@@ -12,7 +12,7 @@ export function isElementTagBeginStart(stream: StringStream) {
   // /[a-zA-Z_] /.test(undefined) === true
   return (
     stream.current === '<' &&
-    !stream.done &&
+    content[pos + 1] !== undefined &&
     elementTagStartReg.test(content[pos + 1])
   );
 }
@@ -98,11 +98,11 @@ export function readAttributes(
     const position = stream.getPositionDetail();
     const attrName = stream.readIgnoreEscaped(
       (ch, s) =>
-      isWhitespace(ch) ||
-      ch === '=' ||
-      ch === '<' ||
-      ch === '>' ||
-      isElementTagSelfClose(s!)
+        isWhitespace(ch) ||
+        ch === '=' ||
+        ch === '<' ||
+        ch === '>' ||
+        isElementTagSelfClose(s!)
     );
 
     error.errorStart = position;
