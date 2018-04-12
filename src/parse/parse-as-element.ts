@@ -79,6 +79,9 @@ export function readAttributes(
 ) {
   const error = new ParseError();
   while (true) {
+    // 跳过 <tagName 后的空白
+    stream.skipWhitespace();
+
     // 读取 attribute 未完成但字符流已终止
     if (stream.done) {
       error.errorStart = node.meta.position!;
@@ -86,9 +89,6 @@ export function readAttributes(
       error.message = `Tag '<${node.tagName} ...' unexpected end`;
       throw error;
     }
-
-    // 跳过 <tagName 后的空白
-    stream.skipWhitespace();
 
     // 完成解析
     if (isElementTagSelfClose(stream) || isElementTagClose(stream)) {
@@ -107,6 +107,16 @@ export function readAttributes(
 
     error.errorStart = position;
 
+    // 无法读取 attribute name
+    if (attrName.length === 0) {
+      error.errorEnd = error.errorStart;
+      error.message = `Tag <${
+        node.tagName
+      } ...> attribute name has unexpected token '${stream.current}'`;
+      throw error;
+    }
+
+    // 检查属性名称前是否有空白
     if (!isWhitespace(stream.content[position.pos - 1])) {
       // <div id="xxx" <---这里必须有一个空白分割符号
       error.messagePositon = position;
@@ -114,15 +124,6 @@ export function readAttributes(
       error.message = `Tag ${
         node.tagName
       } attribute '${attrName}' must after a whitespace token`;
-      throw error;
-    }
-
-    // 无法读取 attribute name
-    if (attrName.length === 0) {
-      error.errorEnd = error.errorStart;
-      error.message = `Tag <${
-        node.tagName
-      } ...> attribute name has unexpected token '${stream.current}'`;
       throw error;
     }
 

@@ -53,6 +53,13 @@ describe('ParseAsElement', () => {
       `Tag <div ...> attribute name has unexpected token '<'`
     );
 
+    error = getParseError('<div ');
+    expect(error.errorStart.pos).toBe(0);
+    expect(error.errorEnd.pos).toBe('<div '.length);
+    expect(getRealMessage(error)).toBe(
+      `Tag '<div ...' unexpected end`
+    );
+
     error = getParseError('<div id=23333>');
     expect(error.messagePositon).toEqual(error.errorStart);
     expect(error.errorStart.pos).toBe(5);
