@@ -3,7 +3,7 @@ import Inspector from 'react-json-inspector';
 import MonacoEditor from 'react-monaco-editor';
 import parseString from '../../src/parse/index';
 import ParseError from '../../src/parse/parse-error';
-import TinyHtmlNode from '../../src/tiny-html-node';
+import { TinyHtmlNodeJson } from '../../src/tiny-html-node';
 import ErrorMessage from './error-message';
 
 import './app.css';
@@ -19,7 +19,7 @@ const requireConfig = {
 const template = `<div id="main">it's tiny html parse</div>`;
 
 interface AppState {
-  nodes: TinyHtmlNode[];
+  nodes: TinyHtmlNodeJson[];
   error?: ParseError;
   content: string;
   editorLoaded: boolean;
@@ -29,7 +29,7 @@ export default class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      nodes: parseString(template),
+      nodes: parseString(template).map(node => node.toJson()),
       content: template,
       editorLoaded: false
     };
@@ -40,7 +40,10 @@ export default class App extends React.Component<{}, AppState> {
     this.setState({ content });
     try {
       const nodes = parseString(content, { skipWhitespace: true });
-      this.setState({ nodes, error: undefined });
+      this.setState({
+        nodes: nodes.map(node => node.toJson()),
+        error: undefined
+      });
     } catch (e) {
       this.setState({ error: e, nodes: [] });
     }
